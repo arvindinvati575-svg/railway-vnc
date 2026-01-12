@@ -8,16 +8,16 @@ RUN apt update && apt install -y \
     novnc websockify \
     xterm \
     dbus-x11 \
-    curl wget git \
+    curl \
     && apt clean
 
-# VNC startup
+# VNC setup
 RUN mkdir -p /root/.vnc
 RUN echo '#!/bin/sh\nunset SESSION_MANAGER\nunset DBUS_SESSION_BUS_ADDRESS\nexec startxfce4 &' > /root/.vnc/xstartup
 RUN chmod +x /root/.vnc/xstartup
 
 EXPOSE 5901
-EXPOSE 6080
 
-CMD vncserver :1 -localhost no -SecurityTypes None && \
-    websockify --web=/usr/share/novnc/ 6080 localhost:5901
+CMD bash -c '\
+vncserver :1 -localhost no -SecurityTypes None && \
+websockify --web=/usr/share/novnc/ ${PORT} localhost:5901'
